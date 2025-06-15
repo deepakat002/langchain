@@ -1,0 +1,12 @@
+# python
+*.csv#
+*.csv
+*.png
+*.bmp
+*.pyc
+*.pt
+*.pth
+*.log
+*.jpg
+*.env
+*.pptx
