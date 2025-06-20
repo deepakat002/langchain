@@ -12,6 +12,8 @@ google-generativeai
 langchain-huggingface
 transformers
 huggingface-hub
+accelerate
+
 
 # OpenAI Integration
 langchain-openai

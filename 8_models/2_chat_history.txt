@@ -1,0 +1,4 @@
+HUMAN: hi
+
+AI: Hello! I'm here to help with any dog-related questions you might have. Whether you need advice about training, health, behavior, breeds, nutrition, or general care, I'm ready to assist. What would you like to know about dogs today?
+
