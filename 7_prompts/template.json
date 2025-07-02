@@ -1,0 +1,17 @@
+{
+    "name": null,
+    "input_variables": [
+        "attribute",
+        "dog",
+        "nwords"
+    ],
+    "optional_variables": [],
+    "output_parser": null,
+    "partial_variables": {},
+    "metadata": null,
+    "tags": null,
+    "template": "\nYou are a dog expert. Please provide information about {dog} in {nwords}. \nAlso, give information about their {attribute}\n",
+    "template_format": "f-string",
+    "validate_template": true,
+    "_type": "prompt"
+}

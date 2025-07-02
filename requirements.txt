@@ -40,3 +40,4 @@ pandas
 faiss-cpu
 chromadb
 wikipedia
+bitsandbytes
