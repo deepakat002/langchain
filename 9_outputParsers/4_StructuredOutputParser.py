@@ -29,7 +29,7 @@ def demo_structured_output_parser():
     print("BEFORE PARSER:")
     print("Original prompt:", prompt_without_parser.invoke({"product_type": "smartphone"}))
     print(f"Type: {type(result_without.content)}")
-    print(f"Content: {result_without.content}")
+    print(f"result: {result_without}")
     print("To get structured data, need manual parsing and field extraction")
     print()
     
