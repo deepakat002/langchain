@@ -1,0 +1,12 @@
+HUMAN: hi
+
+AI: Hello! How can I assist you today?
+
+HUMAN: tell me about beagle
+
+AI: The Beagle is a small to medium-sized breed of hound known for its friendly and curious nature. They are popular as family pets due to their playful and sociable temperament. Beagles are also commonly used as scent detection dogs in law enforcement and search and rescue operations.
+
+HUMAN: pitbull
+
+AI: The Pitbull is a term used to describe several breeds, including the American Pit Bull Terrier, American Staffordshire Terrier, and Staffordshire Bull Terrier. They are known for their strength, loyalty, and intelligence. Despite misconceptions, when properly trained and socialized, Pitbulls can be loving and gentle family pets.
+
