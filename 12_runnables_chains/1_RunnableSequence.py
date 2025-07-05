@@ -22,7 +22,7 @@ prompt = PromptTemplate(
 parser = StrOutputParser()
 
 # 3️⃣ Create the RunnableSequence
-# Here using the convenient pipe syntax:
+# Here using the convenient pipe syntax  LangChain's Expression Language (LCEL):
 name_generation_chain = prompt | llm | parser
 
 # If you prefer, you can also explicitly write it with RunnableSequence:
