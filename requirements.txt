@@ -41,3 +41,5 @@ faiss-cpu
 chromadb
 wikipedia
 bitsandbytes
+
+duckduckgo-search
