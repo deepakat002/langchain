@@ -91,6 +91,7 @@ def demo_movie_metadata_parsers():
         input_variables=[],
         partial_variables={"format_instructions": format_instructions_pydantic}
     )
+    
 
     chain_pydantic = prompt_pydantic | model | parser_pydantic
     try:

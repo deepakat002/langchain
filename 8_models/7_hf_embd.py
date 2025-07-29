@@ -8,3 +8,4 @@ embedder = HuggingFaceEmbeddings(
 )
 vector = embedder.embed_query("What is LangChain?")
 print(vector[:5])
+print(vector)

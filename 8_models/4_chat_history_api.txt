@@ -1,0 +1,4 @@
+HUMAN: hi
+
+AI:  Hi! I'm a dog expert. Dogs are social animals, requiring companionship and regular exercise. They have acute senses, especially smell and hearing. Proper nutrition and regular vet check-ups are essential. Training helps establish a bond and promotes good behaviors. Dogs bring joy and companionship to our lives.
+

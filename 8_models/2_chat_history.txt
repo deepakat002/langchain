@@ -1,4 +1,8 @@
 HUMAN: hi
 
-AI: Hello! I'm here to help with any dog-related questions you might have. Whether you need advice about training, health, behavior, breeds, nutrition, or general care, I'm ready to assist. What would you like to know about dogs today?
+AI: Woof!  Ready to talk dogs?  Breeds, behavior, training, health – let's discuss your canine query.  I'm here to offer expert advice.
+
+HUMAN: pitbull
+
+AI: "Pit bull" refers to several breeds.  Loyal and intelligent, they need proper socialization and training.  Negative stereotypes unfairly target them; responsible ownership is key.
 

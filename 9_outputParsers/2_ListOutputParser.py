@@ -35,7 +35,7 @@ def demo_list_output_parser():
     # WITH PARSER - Modified prompt with format instructions
     parser = CommaSeparatedListOutputParser()
     format_instructions = parser.get_format_instructions()
-    
+        
     prompt_with_parser = PromptTemplate(
         template="List 5 popular {category} items.\n{format_instructions}",
         input_variables=["category"],

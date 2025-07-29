@@ -1,0 +1,8 @@
+HUMAN: hi
+
+AI: Hello! I'm here to help with any dog-related questions you might have. Whether you need advice about training, health, behavior, breeds, nutrition, or general care, I'm ready to assist. What would you like to know about dogs today?
+
+HUMAN: pitbull
+
+AI: Pitbulls are strong, athletic dogs originally bred for bull-baiting. They're loyal, energetic, and affectionate with proper socialization. They need consistent training, regular exercise, and responsible ownership. Despite misconceptions, temperament depends on upbringing, not breed. They require experienced handlers and benefit from early socialization with people and other animals.
+

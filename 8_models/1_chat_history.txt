@@ -1,0 +1,8 @@
+HUMAN: hi
+
+AI: Hello! How can I assist you with your dog-related questions or concerns today?
+
+HUMAN: tell me about beagle
+
+AI: Beagles are a small to medium-sized breed known for their friendly and curious nature. They are scent hounds originally bred for hunting rabbits. Beagles are energetic, intelligent, and good with children. They require regular exercise and mental stimulation to prevent boredom and potential behavioral issues.
+

@@ -1,167 +1,113 @@
-# chat_news_summary.py
-
 import os
 import chainlit as cl
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace
+from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from dotenv import load_dotenv
-import torch
-import re
 
-load_dotenv()  # To load HUGGINGFACEHUB_API_TOKEN from .env
+# Load environment variables from the .env file
+load_dotenv()
 
-# === Set HuggingFace cache directory ===
-os.environ['HF_HOME'] = 'E:/YOUTUBE_CODES/40_LLMs/hugging_face'
-print("✅ CUDA available:", torch.cuda.is_available())
-if torch.cuda.is_available():
-    print("✅ Using GPU:", torch.cuda.get_device_name(0))
-else:
-    print("❌ GPU not available. Using CPU.")
+# Read the token from your specific environment variable
+api_token = os.getenv("HUGGINGFACEHUB_ACCESS_TOKEN")
 
-# === Load Local HuggingFace Pipeline-based model ===
-llm = HuggingFacePipeline.from_model_id(
-    model_id='TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+# Check if the API token is available
+if not api_token:
+    raise ValueError("HUGGINGFACEHUB_ACCESS_TOKEN not found in .env file. Please add it.")
+
+# === 1. Initialize the raw HuggingFace Endpoint ===
+# NOTE: Switched to a more stable model for testing purposes.
+endpoint = HuggingFaceEndpoint(
+    repo_id='mistralai/Mistral-7B-Instruct-v0.2',  # <-- Changed model
     task='text-generation',
-    pipeline_kwargs=dict(
-        temperature=0.7,
-        max_new_tokens=100,
-        do_sample=True,
-        pad_token_id=50256,
-        eos_token_id=[50256, 13, 10],  # Include newline tokens as stop
-        return_full_text=False,
-        repetition_penalty=1.1
-    )
+    temperature=0.7,
+    max_new_tokens=150, # Increased slightly for the larger model
+    huggingfacehub_api_token=api_token,
 )
 
-model = ChatHuggingFace(llm=llm, model_id='TinyLlama/TinyLlama-1.1B-Chat-v1.0')
+# === 2. Wrap the endpoint with ChatHuggingFace ===
+llm = ChatHuggingFace(llm=endpoint)
 
-print(f"----------TinyLlama/TinyLlama-1.1B-Chat-v1.0 loaded locally -------------- ")
+print("✅ Using ChatHuggingFace wrapper for mistralai/Mistral-7B-Instruct-v0.2")
 
-parser = StrOutputParser()
 
-# === Updated Prompt Template ===
+# === Define the prompt template ===
 chat_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a helpful dog expert assistant. Answer questions about dogs briefly and helpfully. Give only ONE response, then stop."),
+    ("system", "You are a dog expert. Provide informative and concise answers, limited to 50 words."),
     MessagesPlaceholder(variable_name="chat_history"),
-    ("human", "{user_input}"),
-    ("assistant", "")  # This helps guide the model to give a single response
+    ("human", "{user_input}")
 ])
 
-# === Save chat history ===
-def save_history_to_txt(history: list, filepath: str = "4_chat_history.txt"):
+# === Define the output parser ===
+parser = StrOutputParser()
+
+# === Create the full chain using LangChain Expression Language (LCEL) ===
+chain = chat_prompt | llm | parser
+
+
+# === Functions to save and load chat history ===
+def save_history_to_txt(history: list, filepath: str = "4_chat_history_api.txt"):
+    """Saves the chat history to a text file."""
     with open(filepath, "w", encoding="utf-8") as f:
         for msg in history:
             role = msg.type.upper()
             f.write(f"{role}: {msg.content}\n\n")
 
-def load_history_from_txt(filepath: str = "4_chat_history.txt"):
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            lines = f.read().strip().split("\n\n")
-            messages = []
-            for block in lines:
-                if block.startswith("HUMAN:"):
-                    messages.append(HumanMessage(content=block.replace("HUMAN: ", "").strip()))
-                elif block.startswith("AI:"):
-                    messages.append(AIMessage(content=block.replace("AI: ", "").strip()))
-            return messages
-    except FileNotFoundError:
+def load_history_from_txt(filepath: str = "4_chat_history_api.txt"):
+    """Loads the chat history from a text file."""
+    if not os.path.exists(filepath):
         return []
 
-def clean_response(response_text: str, user_input: str) -> str:
-    """Clean the model response to extract only the assistant's reply"""
-    
-    # Remove the original prompt echo if present
-    if user_input in response_text:
-        response_text = response_text.split(user_input)[-1]
-    
-    # Split by common conversation markers and take the first part
-    stop_markers = [
-        "\nHuman:", "\nUser:", "\nDog:", "\nAssistant:", 
-        "Human:", "User:", "Dog:", "Assistant:",
-        "\n\n", "###"
-    ]
-    
-    cleaned = response_text.strip()
-    
-    for marker in stop_markers:
-        if marker in cleaned:
-            cleaned = cleaned.split(marker)[0]
-    
-    # Remove common prefixes
-    prefixes = ["Assistant:", "AI:", "Bot:", "Response:", "Answer:"]
-    for prefix in prefixes:
-        if cleaned.startswith(prefix):
-            cleaned = cleaned[len(prefix):].strip()
-    
-    # Take only the first sentence/paragraph if it's too long
-    sentences = cleaned.split('.')
-    if len(sentences) > 2 and len(cleaned) > 150:
-        cleaned = sentences[0] + '.'
-    
-    return cleaned.strip()
+    with open(filepath, "r", encoding="utf-8") as f:
+        lines = f.read().strip().split("\n\n")
+        messages = []
+        for block in lines:
+            if block.startswith("HUMAN:"):
+                messages.append(HumanMessage(content=block.replace("HUMAN: ", "").strip()))
+            elif block.startswith("AI:"):
+                messages.append(AIMessage(content=block.replace("AI: ", "").strip()))
+        return messages
 
-conv = 0
 
-# === Chainlit Handler ===
+# === Chainlit Handler for incoming messages ===
+@cl.on_chat_start
+async def on_chat_start():
+    """Initial setup when a new chat starts."""
+    cl.user_session.set("history", load_history_from_txt())
+    await cl.Message(content="Hello! I am a dog expert. How can I help you today? 🐾").send()
+
 @cl.on_message
 async def on_message(message: cl.Message):
+    """Handles new messages from the user."""
     user_input = message.content
-    global conv
-    conv += 1
-    print(f"---------------- conv:{conv} -------------------\n")
+    chat_history = cl.user_session.get("history", [])
 
-    # Load previous history (limit to last 6 messages to avoid context issues)
-    chat_history = load_history_from_txt()
-    if len(chat_history) > 6:
-        chat_history = chat_history[-6:]
-
-    # Create the full prompt
-    prompt = chat_prompt.format_messages(chat_history=chat_history, user_input=user_input)
-    
-    print(f"------------------- filled prompt --------------\n{prompt}\n\n")
+    print(f"User input: {user_input}")
 
     try:
-        # Use the model directly with proper async call
-        response = await model.ainvoke(prompt)
-        
-        # Extract response content
-        if hasattr(response, 'content'):
-            raw_response = response.content
-        else:
-            raw_response = str(response)
-        
-        print(f"Raw model response: {repr(raw_response)}")
-        
-        # Clean the response
-        parsed_response = clean_response(raw_response, user_input)
-        
-        # Fallback if response is empty or too short
-        if not parsed_response or len(parsed_response.strip()) < 3:
-            parsed_response = "Hello! I'm here to help with dog-related questions. What would you like to know?"
+        # Asynchronously invoke the chain
+        response = await chain.ainvoke({
+            "chat_history": chat_history,
+            "user_input": user_input
+        })
 
-        # Update & save history
+        # Validate the response from the model
+        if not response or not isinstance(response, str) or not response.strip():
+            await cl.Message(content="Sorry, I could not generate a valid response. The model might be temporarily unavailable. Please try again.").send()
+            return
+
+        # Update and save the history
         chat_history.append(HumanMessage(content=user_input))
-        chat_history.append(AIMessage(content=parsed_response))
+        chat_history.append(AIMessage(content=response))
+        cl.user_session.set("history", chat_history)
         save_history_to_txt(chat_history)
-        
-        print(f"----------------- chat history \n {chat_history}")
-        print(f"----------------- final response: {parsed_response}")
 
-        # Display response
-        await cl.Message(content=parsed_response).send()
-       
+        print(f"Final response: {response}")
+
+        # Send the response back to the user
+        await cl.Message(content=response).send()
+
     except Exception as e:
-        error_msg = f"Error generating response: {str(e)}"
-        print(f"Error details: {error_msg}")
+        error_msg = f"Sorry, an unexpected error occurred: {str(e)}"
         await cl.Message(content=error_msg).send()
-
-@cl.on_chat_start
-async def start():
-    await cl.Message(content="🐕 Hello! I'm your dog expert assistant. Ask me anything about dogs!").send()
-
-if __name__ == "__main__":
-    # Run the Chainlit app
-    pass
