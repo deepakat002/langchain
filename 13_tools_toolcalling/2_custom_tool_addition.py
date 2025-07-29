@@ -23,6 +23,10 @@ def add_numbers(a: float, b: float) -> float:
 
 print(f"------- Custom Tool Info --------\n")
 print(f"name: {add_numbers.name} \n description:{add_numbers.description}\n arguments:{add_numbers.args}")
+print(f"----------- How does LLM see this function ----------\n")
+print(add_numbers.args_schema.model_json_schema())
+print(f"\n----------- XXX ----------\n")
+
 
 ### Tool Binding
 # Bind the custom 'add_numbers' tool to the LLM.
