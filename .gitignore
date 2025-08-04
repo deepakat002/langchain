@@ -7,6 +7,6 @@
 *.log
 *.jpg
 *.env
-*.pptx
+# *.pptx
 chroma_db
 .chainlit

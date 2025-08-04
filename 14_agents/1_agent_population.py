@@ -38,9 +38,6 @@ tools = [search_tool]
 # -----------------------------------------------------------------------------
 # Step 3: Pull the ReAct Prompt from LangChain Hub
 # -----------------------------------------------------------------------------
-# The LangChain Hub is a repository of pre-built prompts. We are using the
-# standard 'ReAct' prompt which is designed to enable the Thought/Action/Observation
-# loop that defines the ReAct pattern.
 prompt = hub.pull("hwchase17/react")
 
 # -----------------------------------------------------------------------------
@@ -59,7 +56,7 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 # Step 5: Run the Agent
 # -----------------------------------------------------------------------------
 # Define the task for the agent.
-task = "Find the population of the capital of India."
+task = "Find the current population of the capital of India."
 
 # Invoke the agent executor with the task. This starts the ReAct loop.
 result = agent_executor.invoke({"input": task})
